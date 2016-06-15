@@ -27,12 +27,12 @@ public class User extends NamedEntity {
     public User() {
     }
 
-    public User(Integer id, String name, String email, String password, Role role, Role... roles) {
-        this(id, name, email, password, UserMealsUtil.DEFAULT_CALORIES_PER_DAY, true, EnumSet.of(role, roles));
+    public User(String name, String email, String password, Role role, Role... roles) {
+        this(name, email, password, UserMealsUtil.DEFAULT_CALORIES_PER_DAY, true, EnumSet.of(role, roles));
     }
 
-    public User(Integer id, String name, String email, String password, int caloriesPerDay, boolean enabled, Set<Role> roles) {
-        super(id, name);
+    public User(String name, String email, String password, int caloriesPerDay, boolean enabled, Set<Role> roles) {
+        super(name);
         this.email = email;
         this.password = password;
         this.caloriesPerDay = caloriesPerDay;
