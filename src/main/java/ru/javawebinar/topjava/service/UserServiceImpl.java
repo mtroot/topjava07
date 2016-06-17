@@ -24,15 +24,15 @@ public class UserServiceImpl implements UserService {
     }
 
     public void delete(int id) {
-        ExceptionUtil.checkNotFoundWithId(repository.delete(id), id);
+        ExceptionUtil.check(repository.delete(id), id);
     }
 
     public User get(int id) throws NotFoundException {
-        return ExceptionUtil.checkNotFoundWithId(repository.get(id), id);
+        return ExceptionUtil.check(repository.get(id), id);
     }
 
     public User getByEmail(String email) throws NotFoundException {
-        return ExceptionUtil.checkNotFound(repository.getByEmail(email), "email=" + email);
+        return ExceptionUtil.check(repository.getByEmail(email), "email=" + email);
     }
 
     public List<User> getAll() {
