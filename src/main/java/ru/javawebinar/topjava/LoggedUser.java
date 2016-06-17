@@ -25,6 +25,8 @@ public class LoggedUser {
         return get().id;
     }
 
+    public static void setId(int id) { get().id = id; }
+
     public Set<Role> getAuthorites() { return roles; }
 
     public boolean isEnabled() { return enabled; }

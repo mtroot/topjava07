@@ -53,6 +53,6 @@ public class UserMealServiceImpl implements UserMealService {
 
     @Override
     public List<UserMeal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return repository.getBetween(startDate, endDate.plus(1, ChronoUnit.DAYS), userId);
+        return repository.getBetween(startDate, endDate, userId);
     }
 }
