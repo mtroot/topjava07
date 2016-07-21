@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,8 +12,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface ProxyUserMealRepository extends JpaRepository<UserMeal, Integer> {
 
-    @Override
-    List<UserMeal> findAll(Sort sort);
+    @Query("SELECT FROM UserMeal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC")
+    List<UserMeal> findAll(@Param("userId") int userId);
 
     @Override
     @Transactional

@@ -20,27 +20,18 @@ import java.util.stream.Collectors;
 @Repository
 public class DataJpaUserMealRepositoryImpl implements UserMealRepository{
 
-    private static final Sort SORT_DATETIME = new Sort(new Sort.Order(Sort.Direction.DESC, "date_time"));
-
     @Autowired
     ProxyUserMealRepository proxy;
 
     @Autowired
-    UserRepository userRepository;
+    ProxyUserRepository userProxy;
 
     @Override
     public UserMeal save(UserMeal userMeal, int userId) {
-        User user = userMeal.getUser();
-        if (user == null) {
-            User u = userRepository.get(userId);
-            if(u == null) {
-                return null;
-            } else {
-                userMeal.setUser(u);
-            }
-        } else {
-            user.setId(userId);
+        if (userMeal == null || userProxy.findOne(userId) == null) {
+            return null;
         }
+        userMeal.setUser(userProxy.findOne(userId));
         return proxy.save(userMeal);
     }
 
@@ -59,11 +50,7 @@ public class DataJpaUserMealRepositoryImpl implements UserMealRepository{
 
     @Override
     public List<UserMeal> getAll(int userId) {
-        List<UserMeal> meals = proxy.findAll(SORT_DATETIME)
-                .stream()
-                .filter(m -> m.getUser().getId() == userId)
-                .collect(Collectors.toList());
-        return meals;
+        return proxy.findAll(userId);
     }
 
     @Override
