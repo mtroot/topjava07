@@ -1,71 +1,44 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import ru.javawebinar.topjava.AuthorizedUser;
-import ru.javawebinar.topjava.model.UserMeal;
-import ru.javawebinar.topjava.service.UserMealService;
-import ru.javawebinar.topjava.to.UserMealWithExceed;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import ru.javawebinar.topjava.util.TimeUtil;
-import ru.javawebinar.topjava.util.UserMealsUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 /**
- * GKislin
- * 06.03.2015.
+ * Created by tmr on 7/24/16.
  */
 @Controller
-public class UserMealRestController {
-    private static final Logger LOG = LoggerFactory.getLogger(UserMealRestController.class);
+public class UserMealRestController extends AbstractUserMealController {
 
-    @Autowired
-    private UserMealService service;
+    private static final String FILTER = "filter";
+    private static final String CREATE = "create";
+    private static final String UPDATE = "update";
+    private static final String DELETE = "delete";
 
-    public UserMeal get(int id) {
-        int userId = AuthorizedUser.id();
-        LOG.info("get meal {} for User {}", id, userId);
-        return service.get(id, userId);
+    @RequestMapping(value = "/meals", method = RequestMethod.GET)
+    public String mealList(Model model) {
+        model.addAttribute("mealList", getAll());
+        return "mealList";
     }
 
-    public void delete(int id) {
-        int userId = AuthorizedUser.id();
-        LOG.info("delete meal {} for User {}", id, userId);
-        service.delete(id, userId);
-    }
-
-    public List<UserMealWithExceed> getAll() {
-        int userId = AuthorizedUser.id();
-        LOG.info("getAll for User {}", userId);
-        return UserMealsUtil.getWithExceeded(service.getAll(userId), AuthorizedUser.getCaloriesPerDay());
-    }
-
-    public void update(UserMeal meal, int id) {
-        meal.setId(id);
-        int userId = AuthorizedUser.id();
-        LOG.info("update {} for User {}", meal, userId);
-        service.update(meal, userId);
-    }
-
-    public UserMeal create(UserMeal meal) {
-        meal.setId(null);
-        int userId = AuthorizedUser.id();
-        LOG.info("create {} for User {}", meal, userId);
-        return service.save(meal, userId);
-    }
-
-    public List<UserMealWithExceed> getBetween(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
-        int userId = AuthorizedUser.id();
-        LOG.info("getBetween dates {} - {} for time {} - {} for User {}", startDate, endDate, startTime, endTime, userId);
-
-        return UserMealsUtil.getFilteredWithExceeded(
-                service.getBetweenDates(
-                        startDate != null ? startDate : TimeUtil.MIN_DATE, endDate != null ? endDate : TimeUtil.MAX_DATE, userId),
-                        startTime != null ? startTime : LocalTime.MIN, endTime != null ? endTime : LocalTime.MAX, AuthorizedUser.getCaloriesPerDay()
-        );
+    @RequestMapping(value = "/meals", method = RequestMethod.POST)
+    public String mealListAction(HttpServletRequest request, Model model) {
+        String action = request.getParameter("action");
+        if(FILTER.equals(action)) {
+            LocalDate startDate = TimeUtil.parseLocalDate(request.getParameter("startDate"));
+            LocalDate endDate = TimeUtil.parseLocalDate(request.getParameter("endDate"));
+            LocalTime startTime = TimeUtil.parseLocalTime(request.getParameter("startTime"));
+            LocalTime endTime = TimeUtil.parseLocalTime(request.getParameter("endTime"));
+            model.addAttribute("mealList", getBetween(startDate,startTime,endDate,endTime));
+            return "mealList";
+        }
+        return "userList";
     }
 }
